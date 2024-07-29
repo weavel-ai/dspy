@@ -94,6 +94,7 @@ class GPT3(LM):
 
         self.kwargs["model"] = model
         self.history: list[dict[str, Any]] = []
+        self.usage = {}
 
     def _openai_client(self):
         return openai
@@ -102,8 +103,15 @@ class GPT3(LM):
         """Log the total tokens from the OpenAI API response."""
         usage_data = response.get("usage")
         if usage_data:
-            total_tokens = usage_data.get("total_tokens")
-            logging.debug(f"OpenAI Response Token Usage: {total_tokens}")
+            if not isinstance(usage_data, dict):
+                usage_dict = usage_data.model_dump()
+            else:
+                usage_dict = usage_data
+            for key, value in usage_dict.items():
+                if key in self.usage:
+                    self.usage[key] += value
+                else:
+                    self.usage[key] = value
 
     def basic_request(self, prompt: str, **kwargs):
         raw_kwargs = kwargs

@@ -17,6 +17,7 @@ class LM(ABC):
         self.provider = "default"
 
         self.history = []
+        self.usage = {}
 
     @abstractmethod
     def basic_request(self, prompt, **kwargs):
@@ -35,6 +36,10 @@ class LM(ABC):
 
     def print_red(self, text: str, end: str = "\n"):
         return "\x1b[31m" + str(text) + "\x1b[0m" + end
+    
+    @abstractmethod
+    def log_usage(self, response):
+        pass
 
     def inspect_history(self, n: int = 1, skip: int = 0):
         """Prints the last n prompts and their completions.
